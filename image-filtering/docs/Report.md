@@ -9,6 +9,8 @@ h(m, n) = \begin{cases}
 \end{cases}
 $$
 
+### Frequency Response
+
 We can plot the magnitude of the impulse response by finding the analytical expression for $H(e^{ju}, e^{jv})$ across all values, which is the DSFT:
 
 $$
@@ -20,4 +22,10 @@ We can substitute $\frac{1}{81}$ within the range $-4\leq{n,m}\leq4$ since that 
 $$
 H(u, v) = \sum_{n=-4}^{4} \sum_{m=-4}^{4} \frac{1}{81} e^{-j2\pi(\frac{un}{9} + \frac{vm}{9})}
 $$
+
+Plots of the frequency responses are as follows:
+
+![Alt text](../img/fir_lpf_freq_resp_2d.png)
+![Alt text](../img/fir_lpf_freq_resp_3d.png)
+
 

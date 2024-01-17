@@ -29,6 +29,6 @@ ax2.set_xlabel('u')
 ax2.set_ylabel('v')
 
 fig1.savefig('img/fir_lpf_freq_resp_2d')
-fig2.savefig('img/fir_lpf_freq_response_3d')
+fig2.savefig('img/fir_lpf_freq_resp_3d')
 
 plt.show()
