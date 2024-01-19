@@ -1,6 +1,6 @@
 ## FIR Low Pass Filter
 
-Analyze and implement a simple low pass filter given by the 9 × 9 point spread function:
+Analyze and implement a simple low pass filter given by the 9 × 9 point spread fumction:
 
 $$
 h(m, n) = \begin{cases}
@@ -14,13 +14,13 @@ $$
 We can plot the magnitude of the impulse response by finding the analytical expression for $H(e^{ju}, e^{jv})$ across all values, which is the DSFT:
 
 $$
-H(u, v) = \sum_{n=-\infin}^{\infin} \sum_{m=-\infin}^{\infin} f(n, m) e^{-j2\pi(\frac{un}{N} + \frac{vm}{M})}
+H(u, v) = \sum_{n=-\infin}^{\infin} \sum_{m=-\infin}^{\infin} f(n, m) e^{-j(um + vn)}
 $$
 
-We can substitute $\frac{1}{81}$ within the range $-4\leq{n,m}\leq4$ since that is the only non-zero piece of the function and get the following:
+We can substitute $\frac{1}{81}$ within the range $-4\leq{n,m}\leq4$ since that is the only non-zero piece of the fumction and get the following:
 
 $$
-H(u, v) = \sum_{n=-4}^{4} \sum_{m=-4}^{4} \frac{1}{81} e^{-j2\pi(\frac{un}{9} + \frac{vm}{9})}
+H(u, v) = \sum_{n=-4}^{4} \sum_{m=-4}^{4} \frac{1}{81} e^{-j(um + vn)}
 $$
 
 ### Frequency Response Plots
@@ -133,7 +133,7 @@ void apply2DFIRFilter(uint8_t **input, uint8_t **output, int height, int width)
           int colIdx = j - filterRadius + n;
           // printf("i: r%d c%d ", rowIdx, colIdx);
 
-          // Check boundaries
+          // Check boumdaries
           if (rowIdx >= 0 && rowIdx < height && colIdx >= 0 && colIdx < width)
           {
             sum += FILTER_COEFFICIENT * (double)input[rowIdx][colIdx];
@@ -162,4 +162,49 @@ void error(char *name)
 
 ```
 
+## FIR Sharpening Filter
+
+### Derivation of H(u, v)
+
+We can plot the magnitude of the impulse response by finding the analytical expression for $H(e^{ju}, e^{jv})$ across all values, which is the DSFT:
+
+$$
+H(u, v) = \sum_{n=-\infin}^{\infin} \sum_{m=-\infin}^{\infin} f(n, m) e^{-j(um + vn)}
+$$
+
+We can substitute $\frac{1}{25}$ within the range $-2\leq{n,m}\leq2$ since that is the only non-zero piece of the fumction and get the following:
+
+$$
+H(u, v) = \sum_{n=-2}^{2} \sum_{m=-2}^{2} \frac{1}{25} e^{-j(um + vn)}
+$$
+
+### H(u, v) Frequency Response Plots
+
+![Alt text](../img/fir_lpf_5_freq_resp_2d.png)
+![Alt text](../img/fir_lpf_5_freq_resp_3d.png)
+
+### Derivation of G(u, v)
+
+To find an expression for $G(e^{ju}, e^{jv})$, we apply the DSFT to $g(m, n)$:
+
+$$
+G(u, v) = \sum_{n=-\infin}^{\infin} \sum_{m=-\infin}^{\infin} g(m,n) e^{-j(um + vn)}
+$$
+
+Substituting, we get the following:
+
+$$
+G(u, v) = \sum_{n=-2}^{2} \sum_{m=-2}^{2} (\delta(m,n) + \lambda(\delta(m,n) - h(m,n))) e^{-j(um + vn)}
+$$
+
+Substituting for h(m,n) and reducing, we get:
+
+$$
+G(u, v) = (1 + \lambda(1 - \sum_{n=-2}^{2} \sum_{m=-2}^{2}\frac{1}{25} e^{-j(um + vn)}))
+$$
+
+### G(u, v) Frequency Response Plots
+
+![Alt text](../img/fir_sharpen_freq_resp_2d.png)
+![Alt text](../img/fir_sharpen_freq_resp_3d.png)
 
