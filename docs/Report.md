@@ -348,3 +348,25 @@ void error(char *name)
     exit(1);
 }
 ```
+
+## IIR Filter
+
+### Derivation of $H(u, v)$
+
+We can plot the magnitude of the impulse response by finding the analytical expression for $H(e^{ju}, e^{jv})$ across all values, which is the DSFT. First, we can find the Z-transform:
+
+$$
+H(z_1, z_2) = \frac{0.01}{1 - 0.9z_1^{-1} - 0.9z_2^{-1} + 0.81z_1^{-1}z_2^{-1}}
+$$
+
+Converting to a DSFT from the Z-transform is just a simple substitution:
+
+$$
+H(e^{ju}, e^{jv}) = \frac{0.01}{1 - 0.9e^{-ju} - 0.9e^{-jv} + 0.81e^{-ju}e^{-jv}}
+$$
+
+### Frequency Response Plots
+
+![Alt text](../img/iir_freq_resp_2d.png)
+![Alt text](../img/iir_freq_resp_3d.png)
+
