@@ -338,8 +338,7 @@ H(e^{ju}, e^{jv}) = \frac{0.01}{1 - 0.9e^{-ju} - 0.9e^{-jv} + 0.81e^{-ju}e^{-jv}
 <h3 dir="auto" id="filtered-image-1">Filtered Image</h3>
 <p dir="auto"><img src="../img/iir.png" alt="Alt text" data-src="../img/iir.png"></p>
 <h3 dir="auto" id="code-2">Code</h3>
-<pre><code class="code-line language-C" dir="auto">
-<span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;math.h&gt;</span></span>
+<pre><code class="code-line language-C" dir="auto"><span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&lt;math.h&gt;</span></span>
 <span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&quot;tiff.h&quot;</span></span>
 <span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&quot;allocate.h&quot;</span></span>
 <span class="hljs-meta">#<span class="hljs-keyword">include</span> <span class="hljs-string">&quot;randlib.h&quot;</span></span>
@@ -414,30 +413,60 @@ H(e^{ju}, e^{jv}) = \frac{0.01}{1 - 0.9e^{-ju} - 0.9e^{-jv} + 0.81e^{-ju}e^{-jv}
 
 <span class="hljs-type">void</span> <span class="hljs-title function_">apply2DIIRFilter</span><span class="hljs-params">(<span class="hljs-type">uint8_t</span> **input, <span class="hljs-type">uint8_t</span> **output, <span class="hljs-type">int</span> height, <span class="hljs-type">int</span> width)</span>
 {
+    <span class="hljs-comment">// copy input to double array</span>
+    <span class="hljs-type">double</span> **input_double = (<span class="hljs-type">double</span> **)get_img(width, height, <span class="hljs-keyword">sizeof</span>(<span class="hljs-type">double</span>));
+    <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; height; i++)
+    {
+        <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> j = <span class="hljs-number">0</span>; j &lt; width; j++)
+        {
+            input_double[i][j] = (<span class="hljs-type">double</span>)input[i][j];
+        }
+    }
     <span class="hljs-type">double</span> result;
+    <span class="hljs-type">double</span> **output_double = (<span class="hljs-type">double</span> **)get_img(width, height, <span class="hljs-keyword">sizeof</span>(<span class="hljs-type">double</span>));
     <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; height; ++i)
     {
         <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> j = <span class="hljs-number">0</span>; j &lt; width; ++j)
         {
             <span class="hljs-keyword">if</span> (i - <span class="hljs-number">1</span> &lt; <span class="hljs-number">0</span> &amp;&amp; j - <span class="hljs-number">1</span> &lt; <span class="hljs-number">0</span>)
             {
-                result = <span class="hljs-number">0.01</span> * input[i][j];
+                result = <span class="hljs-number">0.01</span> * input_double[i][j];
             }
             <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (i - <span class="hljs-number">1</span> &lt; <span class="hljs-number">0</span>)
             {
-                result = <span class="hljs-number">0.01</span> * input[i][j] + <span class="hljs-number">0.9</span> * (output[i][j - <span class="hljs-number">1</span>]);
+                result = <span class="hljs-number">0.01</span> * input_double[i][j] + <span class="hljs-number">0.9</span> * (output_double[i][j - <span class="hljs-number">1</span>]);
             }
             <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (j - <span class="hljs-number">1</span> &lt; <span class="hljs-number">0</span>)
             {
-                result = <span class="hljs-number">0.01</span> * input[i][j] + <span class="hljs-number">0.9</span> * (output[i - <span class="hljs-number">1</span>][j]);
+                result = <span class="hljs-number">0.01</span> * input_double[i][j] + <span class="hljs-number">0.9</span> * (output_double[i - <span class="hljs-number">1</span>][j]);
             }
             <span class="hljs-keyword">else</span>
             {
-                result = <span class="hljs-number">0.01</span> * input[i][j] + <span class="hljs-number">0.9</span> * (output[i - <span class="hljs-number">1</span>][j] + output[i][j - <span class="hljs-number">1</span>]) - <span class="hljs-number">0.81</span> * output[i - <span class="hljs-number">1</span>][j - <span class="hljs-number">1</span>];
+                result = <span class="hljs-number">0.01</span> * input_double[i][j] + <span class="hljs-number">0.9</span> * (output_double[i - <span class="hljs-number">1</span>][j] + output_double[i][j - <span class="hljs-number">1</span>]) - <span class="hljs-number">0.81</span> * output_double[i - <span class="hljs-number">1</span>][j - <span class="hljs-number">1</span>];
             }
 
-            <span class="hljs-comment">// Clip the result to the 0-255 range</span>
-            output[i][j] = (<span class="hljs-type">uint8_t</span>)(result &lt; <span class="hljs-number">0</span> ? <span class="hljs-number">0</span> : (result &gt; <span class="hljs-number">255</span> ? <span class="hljs-number">255</span> : result));
+            output_double[i][j] = result;
+        }
+    }
+
+    <span class="hljs-comment">// chop output</span>
+    <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> i = <span class="hljs-number">0</span>; i &lt; height; i++)
+    {
+        <span class="hljs-keyword">for</span> (<span class="hljs-type">int</span> j = <span class="hljs-number">0</span>; j &lt; width; j++)
+        {
+            <span class="hljs-type">int</span> pixel = (<span class="hljs-type">int</span>)output_double[i][j];
+            <span class="hljs-keyword">if</span> (pixel &gt; <span class="hljs-number">255</span>)
+            {
+                output[i][j] = <span class="hljs-number">255</span>;
+            }
+            <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span> (pixel &lt; <span class="hljs-number">0</span>)
+            {
+                output[i][j] = <span class="hljs-number">0</span>;
+            }
+            <span class="hljs-keyword">else</span>
+            {
+                output[i][j] = pixel;
+            }
         }
     }
 }
@@ -453,7 +482,6 @@ H(e^{ju}, e^{jv}) = \frac{0.01}{1 - 0.9e^{-ju} - 0.9e^{-jv} + 0.81e^{-ju}e^{-jv}
     <span class="hljs-built_in">printf</span>(<span class="hljs-string">&quot;that swaps red and green components from the input image&quot;</span>);
     <span class="hljs-built_in">exit</span>(<span class="hljs-number">1</span>);
 }
-
 </code></pre>
 
 </body>
